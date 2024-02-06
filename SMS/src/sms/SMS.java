@@ -16,9 +16,8 @@ public class SMS {
         System.out.println(" -------------------------------------------------------\n");
     }
     
-    //Login
+    //login
     public static void login()throws Exception {
-        title();
         Scanner input = new Scanner(System.in); 
         System.out.println("                   ----------------");
         System.out.println("                   |     Login     |");  
@@ -42,6 +41,7 @@ public class SMS {
           }else{
               System.out.print("\033[H\033[2J");
               System.out.flush();
+              title();
               System.out.println("    Invalid username or password, Try Again!\n");
               login();
           }
@@ -63,11 +63,10 @@ public class SMS {
         System.out.println("    3 -> Save new Student");
         System.out.println("    4 -> Edit Student");
         System.out.println("    5 -> Remove Student");
-        System.out.println("    6 -> Log Out \n");
+        System.out.println("    6 -> Close \n");
 
         System.out.print("    Enter Your Choice : ");
         int choice = input.nextInt();
-        System.out.println(choice);
 
         switch (choice) {
             case 1:
@@ -88,17 +87,17 @@ public class SMS {
             case 4:
                 System.out.print("\033[H\033[2J");
                 title();
-                //searchStudent();
+                editStudent();
                 break;    
        
             case 5:
                 System.out.print("\033[H\033[2J");
                 title();
-                //removeStudent();
+                removeStudent();
                 break;    
        
             case 6:
-            System.exit(0);
+                System.exit(0);
                 break;  
 
             default:
@@ -109,7 +108,7 @@ public class SMS {
         }
     }
     
-    //View all students
+    //view all students
     public static void viewAllStudents() throws Exception{
 
         System.out.println("                   --------------------");
@@ -123,11 +122,8 @@ public class SMS {
           ResultSet rs = st.executeQuery(query);
           
           while(rs.next()){
-              for(int i =1; i<=6;i++){
-                  if(i == 4 || i == 5){
-                      System.out.println("    " + rs.getInt(i));
-                  }
-                  System.out.println("    " + rs.getString(i));
+              for(int i =1; i<=7;i++){
+                  System.out.println((i == 4 && i == 5) ? "    " + rs.getInt(i) : "    " + rs.getString(i));
               }
               System.out.println("\n -------------------------------------------------------\n");
           }
@@ -169,15 +165,11 @@ public class SMS {
   
           rs.next();
             System.out.println();
-              for(int i =1; i<=6;i++){
-                  if(i == 4 || i == 5){
-                      System.out.println("      " + rs.getInt(i));
-                  }
-                  System.out.println("      " + rs.getString(i));
-              }
+              for(int i =1; i<=6;i++)
+                  System.out.println((i == 4 || i == 5) ? "      " + rs.getInt(i) : "      " + rs.getString(i));
               
           Scanner in = new Scanner(System.in);
-          System.out.print("\n press any letter to go to dashboard \n");
+          System.out.print("\n press any letter to go to dashboard ");
            String selection= in.nextLine();
            
             if(selection != null){
@@ -236,9 +228,9 @@ public class SMS {
             if(rs>0){
                 Scanner in = new Scanner(System.in);
           
-                System.out.print("\n Successfully Saved!!!\n To Check Press 'y' or press any letter to go to dashboard: ");
+                System.out.print("\n Successfully Saved!!!\n To Check Press \"y\" or press any letter to go to dashboard: ");
                  String selection= in.nextLine();
-                 if((selection.toLowerCase()).equals("y")){
+                 if(selection.equalsIgnoreCase("y")){
                      viewAllStudents();
                  }else{
                      dashboard();
@@ -251,8 +243,149 @@ public class SMS {
 
     }
     
+    //edit specific student info
+    public static void editStudent() throws Exception{
+
+        System.out.println("                   ----------------");
+        System.out.println("                   | Edit Student |");  
+        System.out.println("                   ----------------\n");
+
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("   Enter the Student Id: ");
+        int id = input.nextInt();
+        
+        String query = "Select * from Students where student_id = ?;";
+        try(Connection con = DB_connection.dbConnection()){
+            
+          PreparedStatement ps = con.prepareStatement(query);
+          ps.setInt(1, id);
+          
+          ResultSet rs = ps.executeQuery();
+          
+          if( rs.next() && (rs.getString(2)) != null){   
+              String[] fieldNames = {"Name","NIC","Age","Contact","Gender","Department"};
+              for(int i =2; i<=7;i++){
+                  System.out.println((i == 4 || i == 5) ? "     "+ (i-1) + " " + fieldNames[i-2] + "-> " + rs.getInt(i) : "     "+ (i-1) + " " + fieldNames[i-2] + "-> " + rs.getString(i));
+              }
+              
+              System.out.print("\n   Which field you want to edit: ");
+              int choice = input.nextInt();
+              
+              String updateSql = "Update Students set "+ fieldNames[choice-1] + " = ? where Student_id = ?;";
+              PreparedStatement ps2 = con.prepareStatement(updateSql);
+              System.out.print("   Enter the " + fieldNames[choice-1] + " : ");
+              if (choice == 4 || choice == 5) {
+                int data = input.nextInt(); 
+                ps2.setInt(1, data);
+                ps2.setInt(2, id);
+              } else {
+                String data = input.nextLine();
+                 data = input.nextLine();
+                ps2.setString(1, data);
+                ps2.setInt(2, id);
+              }
+              ps2.executeUpdate();
+              
+              System.out.print("\n Successfully Updated!!!\n Press any letter to go to dashboard ");
+                 String selection= input.nextLine();
+                 if(selection != null){
+                    System.out.print("\033[H\033[2J");
+                    dashboard();
+                 }
+              
+          }else{
+            System.out.print("\n  Ops! That Student Id does\'t exist do you want to try again press \"y\" or press any letter to go back to dashboard: ");
+                String selection= input.nextLine();
+                selection= input.nextLine();
+                if(selection.equalsIgnoreCase("y")){
+                    System.out.print("\033[H\033[2J");
+                    title();
+                    editStudent();
+                }
+                else {
+                    System.out.print("\033[H\033[2J");
+                    dashboard();
+                 }
+          }
+        }catch(Exception e){
+            System.out.println("Error:" + e);
+        } 
+
+        }
+    
+    //delete a student info
+    public static void removeStudent(){
+
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("                   ------------------");
+        System.out.println("                   | Remove Student |");  
+        System.out.println("                   ------------------\n");
+
+        System.out.print("   Enter the Student Id: ");
+        int id = input.nextInt();
+        
+        String query = "Select * from Students where student_id = ?;";
+        try(Connection con = DB_connection.dbConnection()){
+            
+          PreparedStatement ps = con.prepareStatement(query);
+          ps.setInt(1, id);
+          
+          ResultSet rs = ps.executeQuery();
+          
+          if( rs.next() && (rs.getString(2)) != null){   
+              String[] fieldNames = {"Name","NIC","Age","Contact","Gender","Department"};
+              for(int i =2; i<=7;i++){
+                  System.out.println((i == 4 || i == 5) ? "     "+ (i-1) + " " + fieldNames[i-2] + "-> " + rs.getInt(i) : "     "+ (i-1) + " " + fieldNames[i-2] + "-> " + rs.getString(i));
+              }
+              
+              System.out.print("\n   Do you really want to delete this student info? \n   Press \"y\" if you want to delete or press any letter to go to dashboard : ");
+              String choice = input.nextLine();
+              choice = input.nextLine();
+              
+              if(choice.equalsIgnoreCase("y")){
+              String deleteSql = "delete from Students where Student_id = ?;";
+              PreparedStatement ps2 = con.prepareStatement(deleteSql);
+              ps2.setInt(1, id);
+              ps2.executeUpdate();
+              
+              System.out.print("\n Successfully Deleted!!!\n Press any letter to go to dashboard ");
+              String selection = input.nextLine();
+              if(selection != null){
+                System.out.print("\033[H\033[2J");
+                dashboard();
+              }
+
+              }else{
+                  System.out.print("\033[H\033[2J");
+                    dashboard();
+              }
+              
+              
+          }else{
+            System.out.print("\n  Ops! That Student Id does\'t exist do you want to try again press \"y\" or press any letter to go back to dashboard: ");
+                String selection= input.nextLine();
+                selection= input.nextLine();
+                if(selection.equalsIgnoreCase("y")){
+                    System.out.print("\033[H\033[2J");
+                    title();
+                    removeStudent();
+                }
+                else {
+                    System.out.print("\033[H\033[2J");
+                    dashboard();
+                 }
+          }
+        }catch(Exception e){
+            System.out.println("Error:" + e);
+        } 
+                   
+    }
+       
     public static void main(String[] args) throws Exception {
-        login();
+        title();
+        dashboard();
     }
     
 }
