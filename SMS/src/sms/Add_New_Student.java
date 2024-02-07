@@ -37,7 +37,7 @@ public class Add_New_Student {
             title();
             System.out.print("\n    Please fill all of the fields!\n    You missed a field\n\n");
             saveStudent();
-        } 
+        }else{ 
         
         String query = "INSERT INTO Students (Name,NIC,Age,Contact,Gender,Department) VALUES (?,?,?,?,?,?)";
         try(Connection con = DB_connection.dbConnection()){
@@ -68,6 +68,7 @@ public class Add_New_Student {
         }catch(Exception e){
             System.out.println("Error:" + e);
         } 
+        }
 
     }
 }

@@ -46,8 +46,18 @@ public class Edit_Student_Info {
                   System.out.println((i == 4 || i == 5) ? "     "+ (i-1) + " " + fieldNames[i-2] + "-> " + rs.getInt(i) : "     "+ (i-1) + " " + fieldNames[i-2] + "-> " + rs.getString(i));
               }
               
-              System.out.print("\n   Which field you want to edit: ");
-              int choice = input.nextInt();
+              
+              int choice;
+              
+              do{
+                System.out.print("\n   Which field you want to edit: ");
+        
+              while (!input.hasNextInt()) {
+                System.out.print("   Enter a valid number: ");
+                input.next();
+                }
+                choice = input.nextInt();
+              }while(false);
               
               String updateSql = "Update Students set "+ fieldNames[choice-1] + " = ? where Student_id = ?;";
               PreparedStatement ps2 = con.prepareStatement(updateSql);
