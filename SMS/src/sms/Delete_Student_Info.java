@@ -23,8 +23,19 @@ public class Delete_Student_Info {
         System.out.println("                   | Remove Student |");  
         System.out.println("                   ------------------\n");
 
-        System.out.print("   Enter the Student Id: ");
-        int id = input.nextInt();
+        int id;
+        
+        do{
+        System.out.print("    Enter the Student ID: ");
+        
+        while (!input.hasNextInt()) {
+            title();
+            System.out.println("                Invalid input, Try Again!");
+            removeStudent();
+        }
+            id = input.nextInt();
+        }while(false);
+        
         
         String query = "Select * from Students where student_id = ?;";
         try(Connection con = DB_connection.dbConnection()){

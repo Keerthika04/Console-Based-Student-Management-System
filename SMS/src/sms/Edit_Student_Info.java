@@ -7,7 +7,6 @@ package sms;
 import java.sql.*;
 import java.util.Scanner;
 import static sms.Dashboard.*;
-import static sms.SMS.*;
 
 public class Edit_Student_Info {
      private static DB_Connection DB_connection = DB_Connection.get_Instance();
@@ -20,8 +19,18 @@ public class Edit_Student_Info {
 
         Scanner input = new Scanner(System.in);
 
-        System.out.print("   Enter the Student Id: ");
-        int id = input.nextInt();
+       int id;
+        
+        do{
+        System.out.print("    Enter the Student ID: ");
+        
+        while (!input.hasNextInt()) {
+            title();
+            System.out.println("                Invalid input, Try Again!");
+            editStudent();
+        }
+            id = input.nextInt();
+        }while(false);
         
         String query = "Select * from Students where student_id = ?;";
         try(Connection con = DB_connection.dbConnection()){

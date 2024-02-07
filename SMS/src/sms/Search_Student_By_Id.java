@@ -6,7 +6,6 @@ package sms;
 
 import java.sql.*;
 import java.util.Scanner;
-import static sms.SMS.*;
 import static sms.Dashboard.*;
 
 public class Search_Student_By_Id {
@@ -19,9 +18,21 @@ public class Search_Student_By_Id {
         System.out.println("                   ------------------");
         System.out.println("                   | Search Student |");  
         System.out.println("                   ------------------\n");
-
+        
+        int Id;
+        
+        do{
         System.out.print("    Enter the Student ID: ");
-        int Id = input.nextInt();
+        
+        while (!input.hasNextInt()) {
+            title();
+            System.out.println("                Invalid input, Try Again!");
+            searchStudent();
+        }
+            Id = input.nextInt();
+        }while(false);
+        
+         
         
         String query = "Select * from Students where Student_id = ?;";
         try(Connection con = DB_connection.dbConnection()){
@@ -50,8 +61,7 @@ public class Search_Student_By_Id {
           }
             else{
             System.out.print("\n  Ops! That Student Id does\'t exist do you want to try again press \"y\" or press any letter to go back to dashboard: ");
-                String selection= input.nextLine();
-                selection= input.nextLine();
+                String selection= input.next();
                 if(selection.equalsIgnoreCase("y")){
                     System.out.print("\033[H\033[2J");
                     title();
@@ -64,7 +74,7 @@ public class Search_Student_By_Id {
                  }
           }
         }catch(Exception e){
-            System.out.println("Error:" + e);
+            System.out.println("Error: " + e);
         } 
            
     }

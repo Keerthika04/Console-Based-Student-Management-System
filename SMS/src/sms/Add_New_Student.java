@@ -5,7 +5,6 @@
 package sms;
 import java.sql.*;
 import java.util.Scanner;
-import static sms.SMS.*;
 import static sms.View_All_Students.viewAllStudents;
 import static sms.Dashboard.*;
 
@@ -54,10 +53,9 @@ public class Add_New_Student {
             int rs = ps.executeUpdate();
   
             if(rs>0){
-                Scanner in = new Scanner(System.in);
           
                 System.out.print("\n Successfully Saved!!!\n To Check Press \"y\" or press any letter to go to dashboard: ");
-                 String selection= in.nextLine();
+                 String selection= input.nextLine();
                  if(selection.equalsIgnoreCase("y")){
                      title();
                      viewAllStudents();
