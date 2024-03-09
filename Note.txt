@@ -1,2 +1,4 @@
 Admin User Name: Admin
 Admin Password: kj1234
+
+Application connected with db is inside 'SMS'
